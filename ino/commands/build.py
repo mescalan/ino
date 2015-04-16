@@ -41,15 +41,15 @@ class Build(Command):
     help_line = "Build firmware from the current directory project"
 
     default_make = 'make'
-    default_cc = 'avr-gcc'
-    default_cxx = 'avr-g++'
-    default_ar = 'avr-ar'
-    default_objcopy = 'avr-objcopy'
+    default_cc = 'msp430-elf-gcc'
+    default_cxx = 'msp430-elf-g++'
+    default_ar = 'msp430-elf-ar'
+    default_objcopy = 'msp430-elf-objcopy'
 
-    default_cppflags = '-ffunction-sections -fdata-sections -g -Os -w'
+    default_cppflags = '-I/home/mario/msp430/include -I/home/mario/energia-0101E0015/hardware/msp430/variants/launchpad -ffunction-sections -fdata-sections -g -Os'
     default_cflags = ''
-    default_cxxflags = '-fno-exceptions'
-    default_ldflags = '-Os --gc-sections'
+    default_cxxflags = '-fno-exceptions -fno-rtti'
+    default_ldflags = '-L/home/mario/msp430/include -Os --gc-sections -u,main'
 
     def setup_arg_parser(self, parser):
         super(Build, self).setup_arg_parser(parser)
@@ -121,7 +121,7 @@ class Build(Command):
         board = self.e.board_model(args.board_model)
 
         core_place = os.path.join(board['_coredir'], 'cores', board['build']['core'])
-        core_header = 'Arduino.h' if self.e.arduino_lib_version.major else 'WProgram.h'
+        core_header = 'Arduino.h' if self.e.arduino_lib_version.major else 'Arduino.h'
         self.e.find_dir('arduino_core_dir', [core_header], [core_place],
                         human_name='Arduino core library')
 
@@ -143,7 +143,7 @@ class Build(Command):
 
         for tool_key, tool_binary in toolset:
             self.e.find_arduino_tool(
-                tool_key, ['hardware', 'tools', 'avr', 'bin'], 
+                tool_key, ['hardware', 'tools', 'msp430', 'bin'], 
                 items=[tool_binary], human_name=tool_binary)
 
     def setup_flags(self, args):

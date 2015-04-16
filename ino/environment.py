@@ -77,11 +77,13 @@ class Environment(dict):
         '/usr/local/share/arduino',
         '/usr/share/arduino',
     ]
+    arduino_dist_dir_guesses.insert(0, "/home/mario/energia-0101E0015")
+    arduino_dist_dir_guesses.insert(1, "/home/mario/energia-0101E0015/hardware/msp430")
 
     if platform.system() == 'Darwin':
         arduino_dist_dir_guesses.insert(0, '/Applications/Arduino.app/Contents/Resources/Java')
 
-    default_board_model = 'uno'
+    default_board_model = 'lpmsp430g2553'
     ino = sys.argv[0]
 
     def dump(self):
@@ -124,6 +126,7 @@ class Environment(dict):
         return os.path.join(self.build_dir, self.hex_filename)
 
     def _find(self, key, items, places, human_name, join, multi):
+        print("Looking for {} in {}".format(items, places))
         """
         Search for file-system entry with any name passed in `items` on
         all paths provided in `places`. Use `key` as a cache key.
@@ -169,7 +172,7 @@ class Environment(dict):
 
             self[key] = results
             return results
-
+        raise NameError("FAILED")
         print colorize('FAILED', 'red')
         raise Abort("%s not found. Searched in following places: %s" %
                     (human_name, ''.join(['\n  - ' + p for p in places])))
@@ -217,7 +220,7 @@ class Environment(dict):
         # - hardware/arduino/{chipset}/boards.txt (Arduino 1.5.x, chipset like `avr`, `sam`)
         # - hardware/{platform}/boards.txt (MPIDE 0.xx, platform like `arduino`, `pic32`)
         # we should find and merge them all
-        boards_txts = self.find_arduino_file('boards.txt', ['hardware', '**'], 
+        boards_txts = self.find_arduino_file('boards.txt', ['hardware', 'msp430'], 
                                              human_name='Board description file (boards.txt)',
                                              multi=True)
 

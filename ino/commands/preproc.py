@@ -38,7 +38,7 @@ class Preprocess(Command):
         lines = sketch.split('\n')
         includes, lines = self.extract_includes(lines)
 
-        header = 'Arduino.h' if self.e.arduino_lib_version.major else 'WProgram.h'
+        header = 'Arduino.h' if self.e.arduino_lib_version.major else 'Arduino.h'
         out.write('#include <%s>\n' % header)
 
         out.write('\n'.join(includes))
