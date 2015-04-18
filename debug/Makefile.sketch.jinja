@@ -6,8 +6,6 @@
 {{ target }} : {{ source }}
 	@mkdir -p {{ target|dirname }}
 	@echo {{ source|colorize('yellow') }}
-	@echo {{ e['arduino_dist_dir'] }}
-	@echo {{ e['arduino_core_dir'] }}
 	{{ e.ino }} preproc {% if 'arduino_dist_dir' in e %}-d {{ e['arduino_dist_dir'] }}{% endif %} -o $@ $^
 {% endfor %}
 

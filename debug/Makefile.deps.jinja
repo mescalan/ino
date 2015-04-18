@@ -28,12 +28,8 @@
  #}
 {{ output_filepath }} : {{ cpp.target_paths() }}
 	@echo {{ ('Scanning dependencies of ' ~ src_dir|basename)|colorize('cyan') }}
-	{{ 'echo $^' }}
-	{{ 'echo ' }}{{ output_filepath }}
 	@mkdir -p {{ output_filepath|dirname }}
-	@echo {{ ("HELLO1") }}
 	{{ 'cat $^ >' if cpp.target_paths() else 'touch' }} $@;
-	@echo {{ ("HELLO2") }}
 
 all : {{ output_filepath }}
 	@true

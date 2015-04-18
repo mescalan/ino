@@ -71,14 +71,22 @@ class Environment(dict):
     src_dir = 'src'
     lib_dir = 'lib'
     hex_filename = 'firmware.hex'
+    runenv = platform.platform()
 
     arduino_dist_dir = None
     arduino_dist_dir_guesses = [
         '/usr/local/share/arduino',
         '/usr/share/arduino',
     ]
-    arduino_dist_dir_guesses.insert(0, "/home/mario/energia-0101E0015")
-    arduino_dist_dir_guesses.insert(1, "/home/mario/energia-0101E0015/hardware/msp430")
+    if "CYGWIN" in runenv and "/home" in os.getcwd():
+        print colorize('FAILED', 'red')
+        raise Abort("Cannot place ino directories within Cygwin filesystem: {}".format(os.getcwd()))
+    if "CYGWIN" in runenv:
+        arduino_dist_dir_guesses.insert(0, '/c/Users/Mario/Desktop/energia-0101E0015')
+        arduino_dist_dir_guesses.insert(1, "/c/Users/Mario/Desktop/energia-0101E0015/hardware/msp430")
+    else:
+        arduino_dist_dir_guesses.insert(0, "/home/mario/energia-0101E0015")
+        arduino_dist_dir_guesses.insert(1, "/home/mario/energia-0101E0015/hardware/msp430")
 
     if platform.system() == 'Darwin':
         arduino_dist_dir_guesses.insert(0, '/Applications/Arduino.app/Contents/Resources/Java')
@@ -126,7 +134,7 @@ class Environment(dict):
         return os.path.join(self.build_dir, self.hex_filename)
 
     def _find(self, key, items, places, human_name, join, multi):
-        print("Looking for {} in {}".format(items, places))
+        #print("Looking for {} in {}".format(items, places))
         """
         Search for file-system entry with any name passed in `items` on
         all paths provided in `places`. Use `key` as a cache key.
@@ -193,8 +201,10 @@ class Environment(dict):
         return self.find_file(key, items, self.arduino_dist_places(dirname_parts), human_name, multi=multi)
 
     def find_arduino_tool(self, key, dirname_parts, items=None, human_name=None, multi=False):
+        if "CYGWIN" in self.runenv:
+            items = [item + ".exe" for item in items]
         # if not bundled with Arduino Software the tool should be searched on PATH
-        places = self.arduino_dist_places(dirname_parts) + ['$PATH']
+        places = self.arduino_dist_places(dirname_parts) + os.getenv('PATH').split(os.pathsep)
         return self.find_file(key, items, places, human_name, multi=multi)
 
     def arduino_dist_places(self, dirname_parts):
